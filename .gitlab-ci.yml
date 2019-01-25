@@ -16,9 +16,23 @@ test:
 build:
   stage: build
   script:
-  - ./scripts/build_image.sh
+  - ./scripts/build_image.sh $CI_COMMIT_REF_SLUG $CI_COMMIT_REF_NAME $CI_COMMIT_REF_NAME
 
-deploy:
+development:
   stage: deploy
   script:
-  - echo 'Delopying is not enabled'
+  - echo 'Delopying for development is not enabled'
+
+staging:
+  stage: deploy
+  script:
+  - echo 'Delopying for staging is not enabled'
+  only:
+  - master
+
+production:
+  stage: deploy
+  script:
+  - echo 'Delopying for production is not enabled'
+  only:
+  - tags
