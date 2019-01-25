@@ -29,6 +29,24 @@ echo "*********************************"
 REF_SLUG=$1
 REF_NAME=$2
 
+echo $REF_NAME
+if [ ! -z $DOCKER_BUILD_ALL ]; then
+  echo "Build all"
+else
+  echo "Don't build all"
+fi
+if [ "$REF_NAME" == "master" ]; then
+  echo "It's master"
+else
+  echo "It isn't master"
+fi
+if [ "$REF_NAME" == *"release"* ]; then
+  echo "It's release"
+else
+  echo "It isn't release"
+fi
+
+
 if [ ! -z $DOCKER_BUILD_ALL ] || [ "$REF_NAME" == "master" ] || [ "$REF_NAME" == *"release"* ]; then
   echo "Docker image $REF_SLUG:$REF_NAME is being built"
   docker build -t $REF_SLUG:$REF_NAME .
