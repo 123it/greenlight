@@ -5,9 +5,7 @@ display_usage() {
 	echo -e "Usage:\n  build_image.sh [ARGUMENTS]"
   echo -e "\nMandatory arguments \n"
   echo -e "  repo_slug        The git repository  (e.g. bigbluebutton/greenlight)"
-  echo -e "  branch           The branch (e.g. master)"
-  echo -e "\nOptional arguments \n"
-  echo -e "  tag              The tag that should include the word 'release' (e.g. release-2.0.5)"
+  echo -e "  branch | tag     The branch (e.g. master | release-2.0.5)"
 }
 
 # if less than two arguments supplied, display usage
@@ -22,28 +20,22 @@ if [[ ( $# == "--help") ||  $# == "-h" ]]; then
 	exit 0
 fi
 
-REPO_SLUG=$1
-BRANCH=$2
-TAG=$3
+REF_SLUG=$1
+REF_NAME=$2
 
-if [ ! -z "$TAG" ] && [ "$TAG" == *"release"* ]; then
-  IMAGE=$REPO_SLUG:$TAG
-elif [ "$BRANCH" == "master" ] || [ ! -z $DOCKER_BUILD_ALL ]; then
-  IMAGE=$REPO_SLUG:$BRANCH
-fi
-
-if [ ! -z "$IMAGE" ]; then
-  echo "Docker image $IMAGE is being built"
-  docker build -t $IMAGE .
+if [ ! -z $DOCKER_BUILD_ALL ] || [ "$REF_NAME" == "master" ] || [ "$REF_NAME" == *"release"* ]; then
+  echo "Docker image $REF_SLUG:$REF_NAME is being built"
+  docker build -t $REF_SLUG:$REF_NAME .
 else
-  echo "Docker image for $REPO_SLUG won't be built"
+  echo "Docker image for $REF_SLUG won't be built"
   exit 0
 fi
 
 if [ ! -z "$DOCKER_USERNAME" ] && [ ! -z "$DOCKER_PASSWORD" ]; then
   docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  echo "Docker image $IMAGE is being published"
-  docker push $IMAGE
+  echo "Docker image $REF_SLUG:$REF_NAME is being published"
+  docker push $REF_SLUG:$REF_NAME
 else
-  echo "Docker image for $REPO_SLUG can't be published as DOCKER_USERNAME or DOCKER_PASSWORD are missing"
+  echo "Docker image for $REF_SLUG can't be published as DOCKER_USERNAME or DOCKER_PASSWORD are missing"
+  exit 0
 fi
