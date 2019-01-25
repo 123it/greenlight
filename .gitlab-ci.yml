@@ -1,18 +1,24 @@
-build:
-  stage: build
-  script:
-  - apt-get update -qq && apt-get install -y -qq sqlite3 libsqlite3-dev nodejs
-  - bundle install --path /cache
+stages:
+  - test
+  - build
+  - deploy
 
 test:
   stage: test
   script:
+  - apt-get update -qq && apt-get install -y -qq sqlite3 libsqlite3-dev nodejs
+  - bundle install --path /cache
   - bundle exec rake db:create RAILS_ENV=test
   - bundle exec rake test
   - bundle exec rspec
   - bundle exec rubocop
 
-build_image:
-  stage: deploy
+build:
+  stage: build
   script:
   - ./scripts/build_image.sh
+
+deploy:
+  stage: deploy
+  script:
+  - echo 'Delopying is not enabled'
